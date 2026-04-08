@@ -85,18 +85,21 @@ class ReporteDiarioWizard(models.TransientModel):
 
     def _get_ingresos_por_ou(self, ingreso_tipo):
         """Pagos entrantes por tipo de diario (cash/card/mp), agrupados por OU.
-        Por qué filtramos payment_type='inbound': solo cobros, no pagos a proveedores."""
+        Por qué filtramos payment_type='inbound': solo cobros, no pagos a proveedores.
+        Por qué join a account_move: en Odoo 17 journal_id no es columna directa
+        en account_payment, vive en el account_move relacionado."""
         self.env.cr.execute("""
             SELECT
                 COALESCE(ou.name, '(Sin sucursal)') AS ou_name,
                 COALESCE(SUM(ap.amount), 0.0) AS total
             FROM account_payment ap
-            JOIN account_journal aj ON aj.id = ap.journal_id
+            JOIN account_move mv ON mv.id = ap.move_id
+            JOIN account_journal aj ON aj.id = mv.journal_id
             LEFT JOIN operating_unit ou ON ou.id = ap.operating_unit_id
-            WHERE ap.state = 'posted'
-              AND ap.payment_type = 'inbound'
-              AND ap.date = %(date)s
-              AND ap.company_id = %(cid)s
+            WHERE ap.payment_type = 'inbound'
+              AND mv.state = 'posted'
+              AND mv.date = %(date)s
+              AND mv.company_id = %(cid)s
               AND aj.lupatini_ingreso_tipo = %(tipo)s
             GROUP BY ou.id, ou.name
             ORDER BY ou.name NULLS LAST
@@ -111,17 +114,18 @@ class ReporteDiarioWizard(models.TransientModel):
                 rp.name AS cliente,
                 COALESCE(ou.name, '(Sin sucursal)') AS sucursal,
                 ap.l10n_latam_check_number AS nro_valor,
-                ap.date AS fecha_ingreso,
+                mv.date AS fecha_ingreso,
                 ap.l10n_latam_check_payment_date AS vencimiento,
                 ap.amount AS importe
             FROM account_payment ap
-            JOIN account_journal aj ON aj.id = ap.journal_id
+            JOIN account_move mv ON mv.id = ap.move_id
+            JOIN account_journal aj ON aj.id = mv.journal_id
             LEFT JOIN res_partner rp ON rp.id = ap.partner_id
             LEFT JOIN operating_unit ou ON ou.id = ap.operating_unit_id
-            WHERE ap.state = 'posted'
-              AND ap.payment_type = 'inbound'
-              AND ap.date = %(date)s
-              AND ap.company_id = %(cid)s
+            WHERE ap.payment_type = 'inbound'
+              AND mv.state = 'posted'
+              AND mv.date = %(date)s
+              AND mv.company_id = %(cid)s
               AND aj.l10n_latam_use_check = TRUE
             ORDER BY ou.name NULLS LAST, ap.id
         """, {'date': self.date, 'cid': self.company_id.id})
@@ -134,11 +138,12 @@ class ReporteDiarioWizard(models.TransientModel):
                 aj.name AS banco,
                 COALESCE(SUM(ap.amount), 0.0) AS total
             FROM account_payment ap
-            JOIN account_journal aj ON aj.id = ap.journal_id
-            WHERE ap.state = 'posted'
-              AND ap.payment_type = 'inbound'
-              AND ap.date = %(date)s
-              AND ap.company_id = %(cid)s
+            JOIN account_move mv ON mv.id = ap.move_id
+            JOIN account_journal aj ON aj.id = mv.journal_id
+            WHERE ap.payment_type = 'inbound'
+              AND mv.state = 'posted'
+              AND mv.date = %(date)s
+              AND mv.company_id = %(cid)s
               AND aj.lupatini_ingreso_tipo = 'bank'
             GROUP BY aj.id, aj.name
             ORDER BY aj.name
