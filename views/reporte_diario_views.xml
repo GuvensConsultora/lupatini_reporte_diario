@@ -36,16 +36,11 @@
         <field name="target">new</field>
     </record>
 
-    <!-- ================================================================= -->
-    <!-- Entrada de menú bajo Contabilidad > Informes                      -->
-    <!-- Por qué account_accountant.menu_accounting_reports: es el menú    -->
-    <!-- padre de todos los reportes contables en Odoo 17 Enterprise.      -->
-    <!-- ================================================================= -->
     <menuitem
         id="menu_reporte_diario_ingresos"
         name="Reporte Diario de Ingresos"
-        parent="account_accountant.menu_accounting"
+        parent="lupatini_reporte_diario.menu_lupatini_reportes"
         action="action_reporte_diario_wizard"
-        sequence="90"/>
+        sequence="10"/>
 
 </odoo>

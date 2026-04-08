@@ -37,10 +37,16 @@
     </record>
 
     <menuitem
+        id="menu_lupatini_reportes"
+        name="Reportes Lupatini"
+        parent="account_accountant.menu_accounting"
+        sequence="90"/>
+
+    <menuitem
         id="menu_account_journal_lupatini_config"
         name="Configurar Tipos de Ingreso"
-        parent="account_accountant.menu_accounting"
+        parent="menu_lupatini_reportes"
         action="action_account_journal_lupatini_config"
-        sequence="91"/>
+        sequence="20"/>
 
 </odoo>
