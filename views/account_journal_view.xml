@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Agrega el campo "Tipo en Reporte Diario" al formulario del diario.
+        Por qué inherit_id account.view_account_journal_form: es la vista
+        principal del diario contable en Odoo 17.
+    -->
+    <record id="view_account_journal_lupatini_reporte" model="ir.ui.view">
+        <field name="name">account.journal.lupatini.reporte.diario</field>
+        <field name="model">account.journal</field>
+        <field name="inherit_id" ref="account.view_account_journal_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='l10n_latam_use_check']" position="after">
+                <field name="lupatini_ingreso_tipo"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
