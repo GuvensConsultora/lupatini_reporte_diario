@@ -44,7 +44,7 @@
     <menuitem
         id="menu_reporte_diario_ingresos"
         name="Reporte Diario de Ingresos"
-        parent="account_accountant.menu_accounting_reports"
+        parent="account_accountant.menu_accounting"
         action="action_reporte_diario_wizard"
         sequence="90"/>
 
