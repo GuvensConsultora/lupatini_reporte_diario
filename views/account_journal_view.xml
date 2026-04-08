@@ -10,7 +10,7 @@
         <field name="model">account.journal</field>
         <field name="inherit_id" ref="account.view_account_journal_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='l10n_latam_use_check']" position="after">
+            <xpath expr="//field[@name='type']" position="after">
                 <field name="lupatini_ingreso_tipo"/>
             </xpath>
         </field>
