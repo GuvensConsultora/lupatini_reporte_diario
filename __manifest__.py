@@ -7,11 +7,11 @@
     'category': 'Accounting',
     'license': 'LGPL-3',
     # account_operating_unit: agrega operating_unit_id a account.payment y account.move
-    # l10n_latam_check: agrega l10n_latam_check_number y l10n_latam_check_payment_date
+    # account_check (OCA): agrega account.check con number y payment_date; ap.check_id
     'depends': [
         'account_accountant',
         'account_operating_unit',
-        'l10n_latam_check',
+        'account_check',
     ],
     'data': [
         'security/ir.model.access.csv',

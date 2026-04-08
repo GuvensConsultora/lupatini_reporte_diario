@@ -108,25 +108,26 @@ class ReporteDiarioWizard(models.TransientModel):
 
     def _get_cheques(self):
         """Cheques de terceros recibidos en el día.
-        Detectados por l10n_latam_use_check = True en el diario."""
+        Usa OCA account_check: ap.check_id → account_check (número, vencimiento).
+        Detectamos cheques de terceros por check_id IS NOT NULL y check_type."""
         self.env.cr.execute("""
             SELECT
                 rp.name AS cliente,
                 COALESCE(ou.name, '(Sin sucursal)') AS sucursal,
-                ap.l10n_latam_check_number AS nro_valor,
+                ac.number AS nro_valor,
                 mv.date AS fecha_ingreso,
-                ap.l10n_latam_check_payment_date AS vencimiento,
+                ac.payment_date AS vencimiento,
                 ap.amount AS importe
             FROM account_payment ap
             JOIN account_move mv ON mv.id = ap.move_id
-            JOIN account_journal aj ON aj.id = mv.journal_id
+            JOIN account_check ac ON ac.id = ap.check_id
             LEFT JOIN res_partner rp ON rp.id = ap.partner_id
             LEFT JOIN operating_unit ou ON ou.id = ap.operating_unit_id
             WHERE ap.payment_type = 'inbound'
               AND mv.state = 'posted'
               AND mv.date = %(date)s
               AND mv.company_id = %(cid)s
-              AND aj.l10n_latam_use_check = TRUE
+              AND ac.type = 'third_check'
             ORDER BY ou.name NULLS LAST, ap.id
         """, {'date': self.date, 'cid': self.company_id.id})
         return self.env.cr.dictfetchall()
