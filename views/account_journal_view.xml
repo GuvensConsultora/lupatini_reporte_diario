@@ -15,4 +15,16 @@
             </xpath>
         </field>
     </record>
+
+    <record id="view_account_journal_list_lupatini_reporte" model="ir.ui.view">
+        <field name="name">account.journal.lupatini.reporte.diario.list</field>
+        <field name="model">account.journal</field>
+        <field name="inherit_id" ref="account.view_account_journal_list"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='type']" position="after">
+                <field name="lupatini_ingreso_tipo" optional="show"/>
+            </xpath>
+        </field>
+    </record>
+
 </odoo>
