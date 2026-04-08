@@ -16,15 +16,31 @@
         </field>
     </record>
 
-    <record id="view_account_journal_list_lupatini_reporte" model="ir.ui.view">
+    <record id="view_account_journal_lupatini_list" model="ir.ui.view">
         <field name="name">account.journal.lupatini.reporte.diario.list</field>
         <field name="model">account.journal</field>
-        <field name="inherit_id" ref="account.view_account_journal_list"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='type']" position="after">
-                <field name="lupatini_ingreso_tipo" optional="show"/>
-            </xpath>
+            <list string="Diarios - Reporte Diario" editable="top">
+                <field name="name"/>
+                <field name="type"/>
+                <field name="code"/>
+                <field name="lupatini_ingreso_tipo"/>
+            </list>
         </field>
     </record>
+
+    <record id="action_account_journal_lupatini_config" model="ir.actions.act_window">
+        <field name="name">Configurar Tipos de Ingreso</field>
+        <field name="res_model">account.journal</field>
+        <field name="view_mode">list</field>
+        <field name="views">[(ref('view_account_journal_lupatini_list'), 'list')]</field>
+    </record>
+
+    <menuitem
+        id="menu_account_journal_lupatini_config"
+        name="Configurar Tipos de Ingreso"
+        parent="account_accountant.menu_accounting"
+        action="action_account_journal_lupatini_config"
+        sequence="91"/>
 
 </odoo>
