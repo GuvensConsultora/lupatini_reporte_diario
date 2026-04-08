@@ -20,20 +20,20 @@
         <field name="name">account.journal.lupatini.reporte.diario.list</field>
         <field name="model">account.journal</field>
         <field name="arch" type="xml">
-            <list string="Diarios - Reporte Diario" editable="top">
+            <tree string="Diarios - Reporte Diario" editable="top">
                 <field name="name"/>
                 <field name="type"/>
                 <field name="code"/>
                 <field name="lupatini_ingreso_tipo"/>
-            </list>
+            </tree>
         </field>
     </record>
 
     <record id="action_account_journal_lupatini_config" model="ir.actions.act_window">
         <field name="name">Configurar Tipos de Ingreso</field>
         <field name="res_model">account.journal</field>
-        <field name="view_mode">list</field>
-        <field name="views">[(ref('view_account_journal_lupatini_list'), 'list')]</field>
+        <field name="view_mode">tree</field>
+        <field name="views">[(ref('view_account_journal_lupatini_list'), 'tree')]</field>
     </record>
 
     <menuitem
