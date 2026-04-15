@@ -2,7 +2,7 @@
 {
     'name': 'Lupatini - Reporte Diario de Ingresos',
     'summary': 'Reporte diario: ventas por sucursal, cheques y transferencias',
-    'version': '17.0.1.0.0',
+    'version': '17.0.1.1.0',
     'author': 'Guvens',
     'category': 'Accounting',
     'license': 'LGPL-3',

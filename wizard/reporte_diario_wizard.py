@@ -71,15 +71,20 @@ class ReporteDiarioWizard(models.TransientModel):
         return {'date': self.date, 'cid': self.company_id.id}
 
     def _get_ventas_por_ou(self):
-        """Facturas de cliente agrupadas por OU, sin IVA."""
+        """Venta neta devengada por OU, sin IVA: FA + ND − NC."""
         self.env.cr.execute("""
             SELECT
                 COALESCE(ou.name, '(Sin sucursal)') AS ou_name,
-                COALESCE(SUM(am.amount_untaxed), 0.0)  AS total
+                COALESCE(SUM(
+                    CASE WHEN am.move_type = 'out_refund'
+                         THEN -am.amount_untaxed
+                         ELSE  am.amount_untaxed
+                    END
+                ), 0.0) AS total
             FROM account_move am
             LEFT JOIN operating_unit ou ON ou.id = am.operating_unit_id
-            WHERE am.move_type = 'out_invoice'
-              AND am.state      = 'posted'
+            WHERE am.move_type IN ('out_invoice', 'out_refund')
+              AND am.state        = 'posted'
               AND am.invoice_date = %(date)s
               AND am.company_id   = %(cid)s
             GROUP BY ou.id, ou.name
