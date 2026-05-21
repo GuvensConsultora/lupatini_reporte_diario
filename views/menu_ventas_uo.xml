@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Menú raíz: aparece como app propia en el inicio.
+         Restringido al grupo dedicado para que solo lo vea quien tenga el
+         permiso (Lucas, Gabriel). Sin web_icon: Odoo usa el ícono por defecto;
+         se puede sumar uno propio más adelante. -->
+    <menuitem id="menu_ventas_uo_root"
+              name="Ventas por U.O."
+              sequence="50"
+              groups="lupatini_reporte_diario.group_reporte_ventas_uo"/>
+
+    <!-- Botón que abre el wizard del reporte -->
+    <menuitem id="menu_ventas_uo_action"
+              name="Ventas por Unidad Operativa"
+              parent="menu_ventas_uo_root"
+              action="action_reporte_ventas_uo_wizard"
+              sequence="10"
+              groups="lupatini_reporte_diario.group_reporte_ventas_uo"/>
+
+</odoo>

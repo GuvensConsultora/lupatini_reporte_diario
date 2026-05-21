@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Plantilla del PDF: tabla Unidad Operativa | Venta neta sin IVA -->
+    <template id="ventas_uo_doc">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <t t-set="company"
+                   t-value="docs[:1] and docs[0].company_id or env.company"/>
+                <div class="page">
+                    <h2 style="text-align:center; margin-bottom:4px;">
+                        Ventas por Unidad Operativa
+                    </h2>
+                    <p style="text-align:center; margin-bottom:16px;">
+                        <strong>Período:</strong>
+                        del <span t-esc="date_from"/>
+                        al <span t-esc="date_to"/>
+                        <br/>
+                        <span t-esc="company_name"/>
+                    </p>
+
+                    <table class="table table-sm o_main_table"
+                           style="width:100%;">
+                        <thead>
+                            <tr>
+                                <th>Unidad Operativa</th>
+                                <th class="text-end">Venta neta (sin IVA)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-if="not filas">
+                                <td colspan="2" class="text-center">
+                                    Sin ventas en el período seleccionado.
+                                </td>
+                            </tr>
+                            <tr t-foreach="filas" t-as="fila">
+                                <td t-esc="fila['ou_name']"/>
+                                <td class="text-end">
+                                    <span t-out="fila['total']"
+                                          t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td><strong>Total</strong></td>
+                                <td class="text-end">
+                                    <strong>
+                                        <span t-out="total"
+                                              t-options="{'widget': 'monetary', 'display_currency': company.currency_id}"/>
+                                    </strong>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <!-- Acción de reporte PDF, ligada al modelo del wizard -->
+    <record id="action_report_ventas_uo" model="ir.actions.report">
+        <field name="name">Ventas por Unidad Operativa</field>
+        <field name="model">lupatini.reporte.ventas.uo.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">lupatini_reporte_diario.ventas_uo_doc</field>
+        <field name="report_file">lupatini_reporte_diario.ventas_uo_doc</field>
+        <field name="print_report_name">'Ventas por U.O. %s a %s' % (object.date_from, object.date_to)</field>
+    </record>
+
+</odoo>

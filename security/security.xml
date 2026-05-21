@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <!-- Grupo dedicado para el reporte de Ventas por Unidad Operativa.
+         Por qué grupo propio y no reutilizar account.group_account_user:
+         Lucas pidió que el botón en el inicio solo lo vea quien tenga el
+         permiso. Un grupo dedicado permite asignarlo a las personas puntuales
+         (Lucas, Gabriel) sin abrir el reporte a todo usuario contable. -->
+    <record id="group_reporte_ventas_uo" model="res.groups">
+        <field name="name">Reporte Ventas por Unidad Operativa</field>
+        <field name="category_id" ref="base.module_category_accounting_accounting"/>
+    </record>
+
+</odoo>

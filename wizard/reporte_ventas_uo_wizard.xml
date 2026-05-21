@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Form del wizard de Ventas por Unidad Operativa -->
+    <record id="view_reporte_ventas_uo_wizard_form" model="ir.ui.view">
+        <field name="name">lupatini.reporte.ventas.uo.wizard.form</field>
+        <field name="model">lupatini.reporte.ventas.uo.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Ventas por Unidad Operativa">
+                <group>
+                    <field name="date_from"/>
+                    <field name="date_to"/>
+                    <field name="company_id"
+                           groups="base.group_multi_company"/>
+                </group>
+                <footer>
+                    <button name="action_print_pdf" type="object"
+                            string="Imprimir PDF" class="btn-primary"/>
+                    <button string="Cancelar" class="btn-secondary"
+                            special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Acción que abre el wizard como diálogo -->
+    <record id="action_reporte_ventas_uo_wizard" model="ir.actions.act_window">
+        <field name="name">Ventas por Unidad Operativa</field>
+        <field name="res_model">lupatini.reporte.ventas.uo.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

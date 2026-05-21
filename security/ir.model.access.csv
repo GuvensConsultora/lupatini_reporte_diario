@@ -1,2 +1,3 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_reporte_diario_wizard,lupatini.reporte.diario.wizard,model_lupatini_reporte_diario_wizard,account.group_account_user,1,1,1,1
+access_reporte_ventas_uo_wizard,lupatini.reporte.ventas.uo.wizard,model_lupatini_reporte_ventas_uo_wizard,lupatini_reporte_diario.group_reporte_ventas_uo,1,1,1,1
