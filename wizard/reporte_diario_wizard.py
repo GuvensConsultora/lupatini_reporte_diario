@@ -94,17 +94,24 @@ class ReporteDiarioWizard(models.TransientModel):
 
     def _get_ingresos_por_ou(self):
         """Un solo query para cash/card/mp agrupado por tipo y OU.
-        Devuelve dict[tipo][ou_name] = total."""
+        Devuelve dict[tipo][ou_name] = total.
+        Neto: inbound suma, outbound (reembolsos de NC) resta. Sin el outbound
+        el ingreso del medio de pago queda sobrestimado por el importe de la NC."""
         self.env.cr.execute("""
             SELECT
                 aj.lupatini_ingreso_tipo               AS tipo,
                 COALESCE(ou.name, '(Sin sucursal)')    AS ou_name,
-                COALESCE(SUM(ap.amount), 0.0)          AS total
+                COALESCE(SUM(
+                    CASE WHEN ap.payment_type = 'outbound'
+                         THEN -ap.amount
+                         ELSE  ap.amount
+                    END
+                ), 0.0)                                AS total
             FROM account_payment ap
             JOIN account_move    mv ON mv.id  = ap.move_id
             JOIN account_journal aj ON aj.id  = mv.journal_id
             LEFT JOIN operating_unit ou ON ou.id = ap.operating_unit_id
-            WHERE ap.payment_type          = 'inbound'
+            WHERE ap.payment_type          IN ('inbound', 'outbound')
               AND mv.state                 = 'posted'
               AND mv.date                  = %(date)s
               AND mv.company_id            = %(cid)s
@@ -142,15 +149,21 @@ class ReporteDiarioWizard(models.TransientModel):
         return self.env.cr.dictfetchall()
 
     def _get_transferencias(self):
-        """Transferencias bancarias agrupadas por banco."""
+        """Transferencias bancarias agrupadas por banco.
+        Neto inbound − outbound, igual criterio que _get_ingresos_por_ou."""
         self.env.cr.execute("""
             SELECT
                 aj.name                           AS banco,
-                COALESCE(SUM(ap.amount), 0.0)     AS total
+                COALESCE(SUM(
+                    CASE WHEN ap.payment_type = 'outbound'
+                         THEN -ap.amount
+                         ELSE  ap.amount
+                    END
+                ), 0.0)                           AS total
             FROM account_payment ap
             JOIN account_move    mv ON mv.id = ap.move_id
             JOIN account_journal aj ON aj.id = mv.journal_id
-            WHERE ap.payment_type          = 'inbound'
+            WHERE ap.payment_type          IN ('inbound', 'outbound')
               AND mv.state                 = 'posted'
               AND mv.date                  = %(date)s
               AND mv.company_id            = %(cid)s

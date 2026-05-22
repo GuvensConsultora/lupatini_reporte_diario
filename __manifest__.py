@@ -2,7 +2,7 @@
 {
     'name': 'Lupatini - Reporte Diario de Ingresos',
     'summary': 'Reporte diario (Excel) + reporte PDF de ventas por unidad operativa con selector de período',
-    'version': '17.0.1.2.0',
+    'version': '17.0.1.2.1',
     'author': 'Guvens',
     'category': 'Accounting',
     'license': 'LGPL-3',
