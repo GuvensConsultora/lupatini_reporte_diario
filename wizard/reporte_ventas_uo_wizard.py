@@ -157,14 +157,20 @@ class ReporteVentasUoWizard(models.TransientModel):
 
     def _sin_clasificar(self, date_from, date_to):
         """Detalle de los comprobantes que no se pudieron clasificar, para que el
-        usuario vea de qué se trata en vez de recibir un número suelto."""
+        usuario vea de qué se trata en vez de recibir un número suelto.
+
+        account_journal.name es traducible: en Odoo 17 se guarda como JSONB, así
+        que hay que extraer el idioma con ->> . Un COALESCE(aj.name, '') directo
+        falla con "invalid input syntax for type json".
+        """
         self.env.cr.execute("""
             SELECT
                 am.invoice_date                     AS fecha,
                 COALESCE(ou.name, '(Sin sucursal)') AS ou_name,
                 am.name                             AS comprobante,
                 COALESCE(rp.name, '')               AS cliente,
-                COALESCE(aj.name, '')               AS diario,
+                COALESCE(aj.name ->> %(lang)s,
+                         aj.name ->> 'en_US', '')   AS diario,
                 CASE WHEN am.move_type = 'out_refund'
                      THEN -am.amount_total ELSE am.amount_total END AS total
             FROM account_move am
@@ -179,7 +185,8 @@ class ReporteVentasUoWizard(models.TransientModel):
               AND COALESCE(am.invoice_payment_term_id,
                            orig.invoice_payment_term_id) IS NULL
             ORDER BY am.invoice_date, ou_name
-        """, {'df': date_from, 'dt': date_to, 'cid': self.company_id.id})
+        """, {'df': date_from, 'dt': date_to, 'cid': self.company_id.id,
+              'lang': self.env.lang or 'en_US'})
         return self.env.cr.dictfetchall()
 
     # -------------------------------------------------------------------------
