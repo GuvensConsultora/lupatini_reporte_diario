@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+        Marca cuáles condiciones de pago son "venta de contado".
+        No se precarga ninguna: el criterio lo define el cliente desde la UI,
+        porque el nombre de la condición puede cambiar y puede haber más de una
+        que corresponda a contado.
+
+        La pantalla principal es la lista editable: se ven todas las condiciones
+        juntas y se tildan las que corresponden, en vez de entrar una por una.
+    -->
+    <record id="view_payment_term_lupatini_form" model="ir.ui.view">
+        <field name="name">account.payment.term.lupatini.contado.form</field>
+        <field name="model">account.payment.term</field>
+        <field name="inherit_id" ref="account.view_payment_term_form"/>
+        <field name="arch" type="xml">
+            <!-- Se ancla en 'name' y no en 'note': ese campo no existe en el
+                 form de Odoo 17 y el xpath rompería la actualización. -->
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="lupatini_es_contado"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_payment_term_lupatini_list" model="ir.ui.view">
+        <field name="name">account.payment.term.lupatini.contado.list</field>
+        <field name="model">account.payment.term</field>
+        <field name="arch" type="xml">
+            <tree string="Condiciones de pago - Ventas de Contado" editable="top" create="0" delete="0">
+                <field name="name"/>
+                <field name="lupatini_es_contado" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_payment_term_lupatini_contado" model="ir.actions.act_window">
+        <field name="name">Configurar Ventas de Contado</field>
+        <field name="res_model">account.payment.term</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="view_payment_term_lupatini_list"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Marcá cuáles condiciones de pago son ventas de contado
+            </p>
+            <p>
+                El Reporte de Ventas por Unidad Operativa usa esta marca para separar
+                contado de cuenta corriente, sin importar con qué medio se haya cobrado.
+            </p>
+        </field>
+    </record>
+
+    <menuitem
+        id="menu_payment_term_lupatini_contado"
+        name="Configurar Ventas de Contado"
+        parent="menu_lupatini_reportes"
+        action="action_payment_term_lupatini_contado"
+        sequence="25"/>
+
+</odoo>

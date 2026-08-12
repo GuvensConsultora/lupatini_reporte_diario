@@ -16,6 +16,14 @@
                 <footer>
                     <button name="action_print_pdf" type="object"
                             string="Imprimir PDF" class="btn-primary"/>
+                    <!--
+                        El Excel abre contado / cuenta corriente / sin clasificar,
+                        con cantidad de tickets y corte por día y por sucursal.
+                        El PDF queda como estaba: venta neta por sucursal.
+                    -->
+                    <button name="action_export_excel" type="object"
+                            string="Exportar Excel (contado y cta. cte.)"
+                            class="btn-primary"/>
                     <button string="Cancelar" class="btn-secondary"
                             special="cancel"/>
                 </footer>
