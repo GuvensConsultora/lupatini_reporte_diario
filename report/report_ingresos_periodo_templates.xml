@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Apaisado: la tabla por sucursal lleva una columna por medio de cobro. -->
+    <record id="paperformat_ingresos_periodo" model="report.paperformat">
+        <field name="name">Ingresos por período (A4 apaisado)</field>
+        <field name="format">A4</field>
+        <field name="orientation">Landscape</field>
+        <field name="margin_top">25</field>
+        <field name="margin_bottom">15</field>
+        <field name="margin_left">10</field>
+        <field name="margin_right">10</field>
+        <field name="header_spacing">20</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <template id="ingresos_periodo_doc">
+        <t t-call="web.html_container">
+            <t t-call="web.external_layout">
+                <t t-set="company" t-value="docs[:1].company_id or env.company"/>
+                <t t-set="mon" t-value="{'widget': 'monetary', 'display_currency': company.currency_id}"/>
+                <div class="page" style="font-size:11px;">
+                    <h4 style="margin-bottom:0;">
+                        Lo que entró del <span t-esc="datos['desde']"/> al <span t-esc="datos['hasta']"/>
+                    </h4>
+                    <p style="margin-bottom:8px;">
+                        <strong t-esc="datos['empresa']"/> · sólo cobros a clientes, menos las
+                        reversiones por nota de crédito.
+                        <t t-if="datos['filtro_sucursales']">
+                            <br/>Sucursales: <span t-esc="datos['filtro_sucursales']"/>
+                        </t>
+                    </p>
+
+                    <h6>Por medio de cobro</h6>
+                    <table class="table table-sm table-bordered" style="width:75%;">
+                        <thead>
+                            <tr style="background-color:#1F4E79; color:#FFFFFF;">
+                                <th>Medio</th>
+                                <th class="text-end">Cobrado</th>
+                                <th class="text-end">Reversiones (NC)</th>
+                                <th class="text-end">Neto que entró</th>
+                                <th class="text-end">Cantidad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr t-if="not datos['medios']">
+                                <td colspan="5" class="text-center">Sin cobros en el período.</td>
+                            </tr>
+                            <tr t-foreach="datos['medios']" t-as="m">
+                                <td t-esc="m['medio']"/>
+                                <td class="text-end"><span t-out="m['cobro']" t-options="mon"/></td>
+                                <td class="text-end"><span t-out="m['reversion']" t-options="mon"/></td>
+                                <td class="text-end"><span t-out="m['neto']" t-options="mon"/></td>
+                                <td class="text-end" t-esc="m['n']"/>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr style="background-color:#DDEBF7; font-weight:bold;">
+                                <td>TOTAL</td>
+                                <td class="text-end"><span t-out="datos['total_cobro']" t-options="mon"/></td>
+                                <td class="text-end"><span t-out="datos['total_reversion']" t-options="mon"/></td>
+                                <td class="text-end"><span t-out="datos['total_neto']" t-options="mon"/></td>
+                                <td/>
+                            </tr>
+                        </tfoot>
+                    </table>
+
+                    <table class="table table-sm table-bordered" style="width:60%;">
+                        <thead>
+                            <tr style="background-color:#1F4E79; color:#FFFFFF;">
+                                <th>Aparte (no está en el total de arriba)</th>
+                                <th class="text-end">Importe</th>
+                                <th class="text-end">Cantidad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Retenciones que nos hicieron los clientes (no es plata)</td>
+                                <td class="text-end"><span t-out="datos['retenciones']" t-options="mon"/></td>
+                                <td class="text-end" t-esc="datos['retenciones_n']"/>
+                            </tr>
+                            <tr>
+                                <td>Notas de crédito a clientes del período</td>
+                                <td class="text-end"><span t-out="datos['nc']" t-options="mon"/></td>
+                                <td class="text-end" t-esc="datos['nc_n']"/>
+                            </tr>
+                            <tr>
+                                <td>Pagos a proveedores (excluidos)</td>
+                                <td class="text-end"><span t-out="datos['proveedores']" t-options="mon"/></td>
+                                <td class="text-end" t-esc="datos['proveedores_n']"/>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p style="color:#444444; font-size:10px;">
+                        Las notas de crédito con reversión del cobro ya están restadas arriba, en
+                        «Reversiones (NC)». Las demás bajan la deuda del cliente pero no mueven plata.
+                        Las transferencias entre cajas no aparecen porque no son cobros.
+                    </p>
+
+                    <!-- Con una sola fila «Sin sucursal» (la S.H.) la tabla no agrega nada. -->
+                    <t t-if="len(datos['sucursales']) &gt; 1">
+                        <h6>Neto por sucursal y medio</h6>
+                        <table class="table table-sm table-bordered" style="width:100%;">
+                            <thead>
+                                <tr style="background-color:#1F4E79; color:#FFFFFF;">
+                                    <th>Sucursal</th>
+                                    <th t-foreach="datos['columnas']" t-as="col" class="text-end" t-esc="col"/>
+                                    <th class="text-end">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr t-foreach="datos['sucursales']" t-as="s">
+                                    <td t-esc="s['sucursal']"/>
+                                    <td t-foreach="s['valores']" t-as="v" class="text-end">
+                                        <span t-if="v" t-out="v" t-options="mon"/>
+                                        <span t-else="">—</span>
+                                    </td>
+                                    <td class="text-end"><span t-out="s['total']" t-options="mon"/></td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr style="background-color:#DDEBF7; font-weight:bold;">
+                                    <td>TOTAL</td>
+                                    <td t-foreach="datos['totales_sucursal']" t-as="v" class="text-end">
+                                        <span t-out="v" t-options="mon"/>
+                                    </td>
+                                    <td class="text-end"><span t-out="datos['total_neto']" t-options="mon"/></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </t>
+                    <p style="color:#444444; font-size:10px;">
+                        Pago por pago: botón «Excel» del mismo asistente, solapa «Detalle».
+                    </p>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_ingresos_periodo" model="ir.actions.report">
+        <field name="name">Ingresos por período</field>
+        <field name="model">lupatini.ingresos.periodo.wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">lupatini_reporte_diario.ingresos_periodo_doc</field>
+        <field name="report_file">lupatini_reporte_diario.ingresos_periodo_doc</field>
+        <field name="paperformat_id" ref="paperformat_ingresos_periodo"/>
+        <field name="print_report_name">'Ingresos %s a %s' % (object.date_from.strftime('%d-%m-%Y'), object.date_to.strftime('%d-%m-%Y'))</field>
+    </record>
+
+</odoo>

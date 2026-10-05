@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Lupatini - Reporte Diario de Ingresos',
-    'summary': 'Reporte diario (Excel) + reporte PDF de ventas por unidad operativa con selector de período',
-    'version': '17.0.1.3.1',
+    'summary': 'Reporte diario (Excel), ventas por unidad operativa (PDF) e ingresos por período (PDF y Excel)',
+    'version': '17.0.1.4.0',
     'author': 'Guvens',
     'category': 'Accounting',
     'license': 'LGPL-3',
@@ -22,6 +22,8 @@
         'wizard/reporte_ventas_uo_wizard.xml',
         'report/report_ventas_uo_templates.xml',
         'views/menu_ventas_uo.xml',
+        'views/ingresos_periodo_views.xml',
+        'report/report_ingresos_periodo_templates.xml',
     ],
     'installable': True,
     'application': False,
