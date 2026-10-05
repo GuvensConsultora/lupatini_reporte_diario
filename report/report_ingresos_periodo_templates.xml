@@ -6,11 +6,11 @@
         <field name="name">Ingresos por período (A4 apaisado)</field>
         <field name="format">A4</field>
         <field name="orientation">Landscape</field>
-        <field name="margin_top">25</field>
+        <field name="margin_top">38</field>
         <field name="margin_bottom">15</field>
         <field name="margin_left">10</field>
         <field name="margin_right">10</field>
-        <field name="header_spacing">20</field>
+        <field name="header_spacing">33</field>
         <field name="dpi">90</field>
     </record>
 
@@ -19,11 +19,23 @@
             <t t-call="web.external_layout">
                 <t t-set="company" t-value="docs[:1].company_id or env.company"/>
                 <t t-set="mon" t-value="{'widget': 'monetary', 'display_currency': company.currency_id}"/>
-                <div class="page" style="font-size:11px;">
-                    <h4 style="margin-bottom:0;">
+                <style>
+                    .lip { font-size: 9.5px; }
+                    .lip h4 { margin: 0 0 2px 0; font-size: 15px; }
+                    .lip .sub { margin: 0 0 6px 0; }
+                    .lip h6 { margin: 8px 0 3px 0; font-size: 11px; font-weight: bold; }
+                    .lip table.t { border-collapse: collapse; margin-bottom: 4px; }
+                    .lip table.t th, .lip table.t td { border: 1px solid #999999; padding: 1px 5px; }
+                    .lip table.t thead th { background-color: #1F4E79; color: #FFFFFF; font-weight: bold; }
+                    .lip table.t tr.tot td { background-color: #DDEBF7; font-weight: bold; }
+                    .lip .r { text-align: right; }
+                    .lip .nota { color: #444444; font-size: 8.5px; margin: 2px 0 4px 0; }
+                </style>
+                <div class="page lip">
+                    <h4>
                         Lo que entró del <span t-esc="datos['desde']"/> al <span t-esc="datos['hasta']"/>
                     </h4>
-                    <p style="margin-bottom:8px;">
+                    <p class="sub">
                         <strong t-esc="datos['empresa']"/> · sólo cobros a clientes, menos las
                         reversiones por nota de crédito.
                         <t t-if="datos['filtro_sucursales']">
@@ -32,14 +44,14 @@
                     </p>
 
                     <h6>Por medio de cobro</h6>
-                    <table class="table table-sm table-bordered" style="width:75%;">
+                    <table class="t" style="width:75%;">
                         <thead>
-                            <tr style="background-color:#1F4E79; color:#FFFFFF;">
+                            <tr>
                                 <th>Medio</th>
-                                <th class="text-end">Cobrado</th>
-                                <th class="text-end">Reversiones (NC)</th>
-                                <th class="text-end">Neto que entró</th>
-                                <th class="text-end">Cantidad</th>
+                                <th class="r">Cobrado</th>
+                                <th class="r">Reversiones (NC)</th>
+                                <th class="r">Neto que entró</th>
+                                <th class="r">Cantidad</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -48,50 +60,50 @@
                             </tr>
                             <tr t-foreach="datos['medios']" t-as="m">
                                 <td t-esc="m['medio']"/>
-                                <td class="text-end"><span t-out="m['cobro']" t-options="mon"/></td>
-                                <td class="text-end"><span t-out="m['reversion']" t-options="mon"/></td>
-                                <td class="text-end"><span t-out="m['neto']" t-options="mon"/></td>
-                                <td class="text-end" t-esc="m['n']"/>
+                                <td class="r"><span t-out="m['cobro']" t-options="mon"/></td>
+                                <td class="r"><span t-out="m['reversion']" t-options="mon"/></td>
+                                <td class="r"><span t-out="m['neto']" t-options="mon"/></td>
+                                <td class="r" t-esc="m['n']"/>
                             </tr>
                         </tbody>
                         <tfoot>
-                            <tr style="background-color:#DDEBF7; font-weight:bold;">
+                            <tr class="tot">
                                 <td>TOTAL</td>
-                                <td class="text-end"><span t-out="datos['total_cobro']" t-options="mon"/></td>
-                                <td class="text-end"><span t-out="datos['total_reversion']" t-options="mon"/></td>
-                                <td class="text-end"><span t-out="datos['total_neto']" t-options="mon"/></td>
+                                <td class="r"><span t-out="datos['total_cobro']" t-options="mon"/></td>
+                                <td class="r"><span t-out="datos['total_reversion']" t-options="mon"/></td>
+                                <td class="r"><span t-out="datos['total_neto']" t-options="mon"/></td>
                                 <td/>
                             </tr>
                         </tfoot>
                     </table>
 
-                    <table class="table table-sm table-bordered" style="width:60%;">
+                    <table class="t" style="width:60%;">
                         <thead>
-                            <tr style="background-color:#1F4E79; color:#FFFFFF;">
+                            <tr>
                                 <th>Aparte (no está en el total de arriba)</th>
-                                <th class="text-end">Importe</th>
-                                <th class="text-end">Cantidad</th>
+                                <th class="r">Importe</th>
+                                <th class="r">Cantidad</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
                                 <td>Retenciones que nos hicieron los clientes (no es plata)</td>
-                                <td class="text-end"><span t-out="datos['retenciones']" t-options="mon"/></td>
-                                <td class="text-end" t-esc="datos['retenciones_n']"/>
+                                <td class="r"><span t-out="datos['retenciones']" t-options="mon"/></td>
+                                <td class="r" t-esc="datos['retenciones_n']"/>
                             </tr>
                             <tr>
                                 <td>Notas de crédito a clientes del período</td>
-                                <td class="text-end"><span t-out="datos['nc']" t-options="mon"/></td>
-                                <td class="text-end" t-esc="datos['nc_n']"/>
+                                <td class="r"><span t-out="datos['nc']" t-options="mon"/></td>
+                                <td class="r" t-esc="datos['nc_n']"/>
                             </tr>
                             <tr>
                                 <td>Pagos a proveedores (excluidos)</td>
-                                <td class="text-end"><span t-out="datos['proveedores']" t-options="mon"/></td>
-                                <td class="text-end" t-esc="datos['proveedores_n']"/>
+                                <td class="r"><span t-out="datos['proveedores']" t-options="mon"/></td>
+                                <td class="r" t-esc="datos['proveedores_n']"/>
                             </tr>
                         </tbody>
                     </table>
-                    <p style="color:#444444; font-size:10px;">
+                    <p class="nota">
                         Las notas de crédito con reversión del cobro ya están restadas arriba, en
                         «Reversiones (NC)». Las demás bajan la deuda del cliente pero no mueven plata.
                         Las transferencias entre cajas no aparecen porque no son cobros.
@@ -100,36 +112,36 @@
                     <!-- Con una sola fila «Sin sucursal» (la S.H.) la tabla no agrega nada. -->
                     <t t-if="len(datos['sucursales']) &gt; 1">
                         <h6>Neto por sucursal y medio</h6>
-                        <table class="table table-sm table-bordered" style="width:100%;">
+                        <table class="t" style="width:100%;">
                             <thead>
-                                <tr style="background-color:#1F4E79; color:#FFFFFF;">
+                                <tr>
                                     <th>Sucursal</th>
-                                    <th t-foreach="datos['columnas']" t-as="col" class="text-end" t-esc="col"/>
-                                    <th class="text-end">Total</th>
+                                    <th t-foreach="datos['columnas']" t-as="col" class="r" t-esc="col"/>
+                                    <th class="r">Total</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr t-foreach="datos['sucursales']" t-as="s">
                                     <td t-esc="s['sucursal']"/>
-                                    <td t-foreach="s['valores']" t-as="v" class="text-end">
+                                    <td t-foreach="s['valores']" t-as="v" class="r">
                                         <span t-if="v" t-out="v" t-options="mon"/>
                                         <span t-else="">—</span>
                                     </td>
-                                    <td class="text-end"><span t-out="s['total']" t-options="mon"/></td>
+                                    <td class="r"><span t-out="s['total']" t-options="mon"/></td>
                                 </tr>
                             </tbody>
                             <tfoot>
-                                <tr style="background-color:#DDEBF7; font-weight:bold;">
+                                <tr class="tot">
                                     <td>TOTAL</td>
-                                    <td t-foreach="datos['totales_sucursal']" t-as="v" class="text-end">
+                                    <td t-foreach="datos['totales_sucursal']" t-as="v" class="r">
                                         <span t-out="v" t-options="mon"/>
                                     </td>
-                                    <td class="text-end"><span t-out="datos['total_neto']" t-options="mon"/></td>
+                                    <td class="r"><span t-out="datos['total_neto']" t-options="mon"/></td>
                                 </tr>
                             </tfoot>
                         </table>
                     </t>
-                    <p style="color:#444444; font-size:10px;">
+                    <p class="nota">
                         Pago por pago: botón «Excel» del mismo asistente, solapa «Detalle».
                     </p>
                 </div>
