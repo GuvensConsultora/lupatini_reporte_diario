@@ -26,7 +26,7 @@
                     .lip h6 { margin: 8px 0 3px 0; font-size: 11px; font-weight: bold; }
                     .lip table.t { border-collapse: collapse; margin-bottom: 4px; }
                     .lip table.t th, .lip table.t td { border: 1px solid #999999; padding: 1px 5px; }
-                    .lip table.t thead th { background-color: #1F4E79; color: #FFFFFF; font-weight: bold; }
+                    .lip table.t thead th, .lip table.t thead th span { background-color: #1F4E79 !important; color: #FFFFFF !important; font-weight: bold; }
                     .lip table.t tr.tot td { background-color: #DDEBF7; font-weight: bold; }
                     .lip .r { text-align: right; }
                     .lip .nota { color: #444444; font-size: 8.5px; margin: 2px 0 4px 0; }
