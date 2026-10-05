@@ -83,6 +83,9 @@ class IngresosPeriodoWizard(models.TransientModel):
 
     def _datos(self):
         self.ensure_one()
+        # Todo el cálculo corre en la empresa elegida, no en la activa del usuario: con la CIA
+        # activa y la S.H. elegida, las reglas multiempresa ocultaban sus pagos y daba cero.
+        self = self.with_company(self.company_id)
         if self.date_from > self.date_to:
             raise UserError(_('La fecha «Desde» es posterior a «Hasta».'))
         etiquetas = dict(MEDIOS)
