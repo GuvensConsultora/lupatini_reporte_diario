@@ -157,7 +157,9 @@ class ReporteDiarioWizard(models.TransientModel):
         Neto inbound − outbound, igual criterio que _get_ingresos_por_ou."""
         self.env.cr.execute("""
             SELECT
-                aj.name                           AS banco,
+                -- name es JSONB traducible en O17: sin ->> llega un dict y xlsxwriter falla.
+                COALESCE(aj.name ->> %(lang)s,
+                         aj.name ->> 'en_US', '')  AS banco,
                 COALESCE(SUM(
                     CASE WHEN ap.payment_type = 'outbound'
                          THEN -ap.amount
@@ -176,9 +178,9 @@ class ReporteDiarioWizard(models.TransientModel):
               AND mv.date                  = %(date)s
               AND mv.company_id            = %(cid)s
               AND aj.lupatini_ingreso_tipo = 'bank'
-            GROUP BY aj.id, aj.name
-            ORDER BY aj.name
-        """, self._params())
+            GROUP BY aj.id, banco
+            ORDER BY banco
+        """, {**self._params(), 'lang': self.env.lang or 'es_AR'})
         return self.env.cr.dictfetchall()
 
     # -------------------------------------------------------------------------
