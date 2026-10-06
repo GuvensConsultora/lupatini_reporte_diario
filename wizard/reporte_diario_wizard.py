@@ -95,7 +95,7 @@ class ReporteDiarioWizard(models.TransientModel):
     def _get_ingresos_por_ou(self):
         """Un solo query para cash/card/mp agrupado por tipo y OU.
         Devuelve dict[tipo][ou_name] = total.
-        Neto: inbound suma, outbound (reembolsos de NC) resta. Sin el outbound
+        Neto: inbound suma, outbound (reembolsos de NC) resta. Sólo pagos de clientes. Sin el outbound
         el ingreso del medio de pago queda sobrestimado por el importe de la NC."""
         self.env.cr.execute("""
             SELECT
@@ -112,6 +112,10 @@ class ReporteDiarioWizard(models.TransientModel):
             JOIN account_journal aj ON aj.id  = mv.journal_id
             LEFT JOIN operating_unit ou ON ou.id = ap.operating_unit_id
             WHERE ap.payment_type          IN ('inbound', 'outbound')
+              -- Sólo clientes: sin esto los pagos a proveedores por la misma caja restaban
+              -- (09/2026: $112 M en efectivo, $58 M en tarjetas, $23 M en MP, $252 M en bancos).
+              AND ap.partner_type          = 'customer'
+              AND NOT COALESCE(ap.is_internal_transfer, FALSE)
               AND mv.state                 = 'posted'
               AND mv.date                  = %(date)s
               AND mv.company_id            = %(cid)s
@@ -164,6 +168,10 @@ class ReporteDiarioWizard(models.TransientModel):
             JOIN account_move    mv ON mv.id = ap.move_id
             JOIN account_journal aj ON aj.id = mv.journal_id
             WHERE ap.payment_type          IN ('inbound', 'outbound')
+              -- Sólo clientes: sin esto los pagos a proveedores por la misma caja restaban
+              -- (09/2026: $112 M en efectivo, $58 M en tarjetas, $23 M en MP, $252 M en bancos).
+              AND ap.partner_type          = 'customer'
+              AND NOT COALESCE(ap.is_internal_transfer, FALSE)
               AND mv.state                 = 'posted'
               AND mv.date                  = %(date)s
               AND mv.company_id            = %(cid)s
